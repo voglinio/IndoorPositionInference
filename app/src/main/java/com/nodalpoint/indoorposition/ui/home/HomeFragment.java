@@ -23,6 +23,7 @@ import com.nodalpoint.indoorposition.model.*;
 import com.nodalpoint.indoorposition.model.uncalibratedSensors.UncalibratedAccelerometer;
 import com.nodalpoint.indoorposition.model.uncalibratedSensors.UncalibratedGyroscope;
 import com.nodalpoint.indoorposition.model.uncalibratedSensors.UncalibratedSensor;
+import android.net.wifi.WifiManager;
 
 import java.util.List;
 
@@ -31,6 +32,7 @@ public class HomeFragment extends Fragment {
     private HomeViewModel homeViewModel;
     private ImageView mCustomImage;
     private SensorManager sensorManager;
+
 
 
 
@@ -155,4 +157,6 @@ public class HomeFragment extends Fragment {
         return root;
 
     }
+
+
 }
