@@ -14,10 +14,13 @@ public class MyReceiver extends BroadcastReceiver {
     private WifiManager wifiManager;
     private List<ScanResult> scanResults;
     private ArrayAdapter arrayAdapter;
-    private ArrayList results = new ArrayList<String>();
+    private ArrayList results;// = new ArrayList<String>();
 
-    public MyReceiver(WifiManager wifiManager) {
+    public MyReceiver(WifiManager wifiManager, ArrayList results) {
+
         this.wifiManager = wifiManager;
+        this.results = results;
+
     }
 
 
@@ -26,8 +29,8 @@ public class MyReceiver extends BroadcastReceiver {
         results.clear();
         scanResults = wifiManager.getScanResults();
         for (ScanResult scanResult : scanResults) {
-            results.add(scanResult.SSID + scanResult.capabilities);
-            System.out.println(scanResult.SSID + scanResult.capabilities);
+            results.add(scanResult.BSSID + "\t"  + scanResult.SSID + "\t" + scanResult.frequency + "\t" + scanResult.level + "\t" + scanResult.timestamp);
+            //System.out.println(scanResult.BSSID + " "  + scanResult.SSID + " " + scanResult.frequency + " " + scanResult.level + " " + scanResult.timestamp);
         }
         //arrayAdapter = new ArrayAdapter(context, android.R.layout.simple_list_item_1, results);
         //listView.setAdapter(arrayAdapter);

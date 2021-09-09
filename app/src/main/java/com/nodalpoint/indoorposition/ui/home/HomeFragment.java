@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.nodalpoint.indoorposition.MainActivity;
 import com.nodalpoint.indoorposition.R;
 import com.nodalpoint.indoorposition.model.*;
 import com.nodalpoint.indoorposition.model.uncalibratedSensors.UncalibratedAccelerometer;
@@ -38,7 +39,7 @@ public class HomeFragment extends Fragment {
     private List<CalibratedSensor> calibratedSensors = new ArrayList<>();
     private List<UncalibratedSensor> uncalibratedSensors = new ArrayList<>();
     private Handler sensorHandler = new Handler();
-    final int sensorHandlerDelay = 1000;
+    final int sensorHandlerDelay = 50;
     private final Runnable sensorsRunnable = new Runnable() {
         @RequiresApi(api = Build.VERSION_CODES.N)
         @Override
@@ -57,6 +58,13 @@ public class HomeFragment extends Fragment {
 
             // Put your code here
             System.out.println("WIFI - BLE Data");
+            ((MainActivity)getActivity()).scanWifi();
+            System.out.println("------------------- wifi start -------------------");
+            for (String s : ((MainActivity)getActivity()).wifiResults){
+                System.out.println(s);
+            }
+            System.out.println("------------------- wifi end   -------------------");
+
             wifiBLeHandler.postDelayed(this, wifiBLeHandlerDelay);
         }
     };
