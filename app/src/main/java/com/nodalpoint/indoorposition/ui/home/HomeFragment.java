@@ -6,6 +6,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ import com.nodalpoint.indoorposition.model.uncalibratedSensors.UncalibratedGyros
 import com.nodalpoint.indoorposition.model.uncalibratedSensors.UncalibratedSensor;
 import android.net.wifi.WifiManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class HomeFragment extends Fragment {
@@ -32,7 +34,32 @@ public class HomeFragment extends Fragment {
     private HomeViewModel homeViewModel;
     private ImageView mCustomImage;
     private SensorManager sensorManager;
+    // Sensors
+    private List<CalibratedSensor> calibratedSensors = new ArrayList<>();
+    private List<UncalibratedSensor> uncalibratedSensors = new ArrayList<>();
+    private Handler sensorHandler = new Handler();
+    final int sensorHandlerDelay = 1000;
+    private final Runnable sensorsRunnable = new Runnable() {
+        @RequiresApi(api = Build.VERSION_CODES.N)
+        @Override
+        public void run() {
+            printSensorsValues();
+            sensorHandler.postDelayed(this, sensorHandlerDelay);
+        }
+    };
 
+    private Handler wifiBLeHandler = new Handler();
+    final int wifiBLeHandlerDelay = 2000;
+    private final Runnable wifiBLeRunnable = new Runnable() {
+        @RequiresApi(api = Build.VERSION_CODES.N)
+        @Override
+        public void run() {
+
+            // Put your code here
+            System.out.println("WIFI - BLE Data");
+            wifiBLeHandler.postDelayed(this, wifiBLeHandlerDelay);
+        }
+    };
 
 
 
@@ -45,89 +72,12 @@ public class HomeFragment extends Fragment {
 
         // Setup Managers
         sensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
-
-        // Gyroscope
-        Sensor gyroscopeSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-        CalibratedSensor gyroscope = new Gyroscope(gyroscopeSensor);
-        SensorEventListener gyroscopeSensorListener = gyroscope.createSensorListener();
-        sensorManager.registerListener(gyroscopeSensorListener, gyroscopeSensor, SensorManager.SENSOR_DELAY_NORMAL);
-
-        // Rotation Vector
-        Sensor rotationVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
-        CalibratedSensor rotationVector = new RotationVector(rotationVectorSensor);
-        SensorEventListener rotationVectorSensorListener = rotationVector.createSensorListener();
-        sensorManager.registerListener(rotationVectorSensorListener, rotationVectorSensor, SensorManager.SENSOR_DELAY_NORMAL);
-
-        // Accelerometer
-        Sensor accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        CalibratedSensor accelerometer = new Accelerometer(accelerometerSensor);
-        SensorEventListener accelerometerSensorListener = accelerometer.createSensorListener();
-        sensorManager.registerListener(accelerometerSensorListener, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
-
-        // Geomagnetic
-        Sensor magneticFieldSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-        CalibratedSensor magneticField = new MagneticField(magneticFieldSensor);
-        SensorEventListener magneticFieldSensorListener = magneticField.createSensorListener();
-        sensorManager.registerListener(magneticFieldSensorListener, magneticFieldSensor, SensorManager.SENSOR_DELAY_NORMAL);
-
-        // Uncalibrated Accelerometer
-        Sensor uncalibratedAccelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER_UNCALIBRATED);
-        UncalibratedSensor uncalibratedAccelerometer = new UncalibratedAccelerometer(uncalibratedAccelerometerSensor);
-        SensorEventListener uncalibratedAccelerometerSensorListener = uncalibratedAccelerometer.createSensorListener();
-        sensorManager.registerListener(uncalibratedAccelerometerSensorListener, uncalibratedAccelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
-
-        // Uncalibrated GYROSCOPE
-        Sensor uncalibratedGyroscopeSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE_UNCALIBRATED);
-        UncalibratedSensor uncalibratedGyroscope = new UncalibratedGyroscope(uncalibratedGyroscopeSensor);
-        SensorEventListener uncalibratedGyroscopeSensorListener = uncalibratedGyroscope.createSensorListener();
-        sensorManager.registerListener(uncalibratedGyroscopeSensorListener, uncalibratedGyroscopeSensor, SensorManager.SENSOR_DELAY_NORMAL);
-
-        // Uncalibrated MAGNETIC FIELD
-        Sensor uncalibratedMagneticFieldSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED);
-        UncalibratedSensor uncalibratedMagneticField = new UncalibratedGyroscope(uncalibratedMagneticFieldSensor);
-        SensorEventListener uncalibratedMagneticFieldSensorListener = uncalibratedMagneticField.createSensorListener();
-        sensorManager.registerListener(uncalibratedMagneticFieldSensorListener, uncalibratedMagneticFieldSensor, SensorManager.SENSOR_DELAY_NORMAL);
-
+        setupSensors();
         Button button = (Button) root.findViewById(R.id.record_button);
         button.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             public void onClick(View v) {
-
-                System.out.println("GYROSCOPE AXIS X: " + gyroscope.getAxisX());
-                System.out.println("GYROSCOPE AXIS Y: " + gyroscope.getAxisY());
-                System.out.println("GYROSCOPE AXIS Z: " + gyroscope.getAxisZ());
-                System.out.println("GYROSCOPE ACCURACY: " + gyroscope.getAccuracy());
-                System.out.println("ROTATION VECTOR AXIS X: " + rotationVector.getAxisX());
-                System.out.println("ROTATION VECTOR AXIS X: " + rotationVector.getAxisY());
-                System.out.println("ROTATION VECTOR AXIS X: " + rotationVector.getAxisZ());
-                System.out.println("ACCELEROMETER AXIS X: " + accelerometer.getAxisX());
-                System.out.println("ACCELEROMETER AXIS Y: " + accelerometer.getAxisY());
-                System.out.println("ACCELEROMETER AXIS Z: " + accelerometer.getAxisZ());
-                System.out.println("ACCELEROMETER ACCURACY: " + accelerometer.getAccuracy());
-                System.out.println("MAGNETIC FIELD AXIS X: " + magneticField.getAxisX());
-                System.out.println("MAGNETIC FIELD AXIS Y: " + magneticField.getAxisY());
-                System.out.println("MAGNETIC FIELD AXIS Z: " + magneticField.getAxisZ());
-                System.out.println("MAGNETIC FIELD ACCURACY: " + magneticField.getAccuracy());
-                System.out.println("Uncalibrated ACCELEROMETER AXIS X: " + uncalibratedAccelerometer.getAxisX());
-                System.out.println("Uncalibrated ACCELEROMETER AXIS Y: " + uncalibratedAccelerometer.getAxisY());
-                System.out.println("Uncalibrated ACCELEROMETER AXIS Z: " + uncalibratedAccelerometer.getAxisZ());
-                System.out.println("Uncalibrated ACCELEROMETER BIAS X: " + uncalibratedAccelerometer.getBiasX());
-                System.out.println("Uncalibrated ACCELEROMETER BIAS Y: " + uncalibratedAccelerometer.getBiasY());
-                System.out.println("Uncalibrated ACCELEROMETER BIAS Z: " + uncalibratedAccelerometer.getBiasZ());
-                System.out.println("Uncalibrated ACCELEROMETER ACCURACY: " + uncalibratedAccelerometer.getAccuracy());
-                System.out.println("Uncalibrated GYROSCOPE AXIS X: " + uncalibratedGyroscope.getAxisX());
-                System.out.println("Uncalibrated GYROSCOPE AXIS Y: " + uncalibratedGyroscope.getAxisY());
-                System.out.println("Uncalibrated GYROSCOPE AXIS Z: " + uncalibratedGyroscope.getAxisZ());
-                System.out.println("Uncalibrated GYROSCOPE BIAS X: " + uncalibratedGyroscope.getBiasX());
-                System.out.println("Uncalibrated GYROSCOPE BIAS Y: " + uncalibratedGyroscope.getBiasY());
-                System.out.println("Uncalibrated GYROSCOPE BIAS Z: " + uncalibratedGyroscope.getBiasZ());
-                System.out.println("Uncalibrated GYROSCOPE ACCURACY: " + uncalibratedGyroscope.getAccuracy());
-                System.out.println("Uncalibrated MAGNETIC FIELD AXIS X: " + uncalibratedMagneticField.getAxisX());
-                System.out.println("Uncalibrated MAGNETIC FIELD AXIS Y: " + uncalibratedMagneticField.getAxisY());
-                System.out.println("Uncalibrated MAGNETIC FIELD AXIS Z: " + uncalibratedMagneticField.getAxisZ());
-                System.out.println("Uncalibrated MAGNETIC FIELD BIAS X: " + uncalibratedMagneticField.getBiasX());
-                System.out.println("Uncalibrated MAGNETIC FIELD BIAS Y: " + uncalibratedMagneticField.getBiasY());
-                System.out.println("Uncalibrated MAGNETIC FIELD BIAS Z: " + uncalibratedMagneticField.getBiasZ());
-                System.out.println("Uncalibrated MAGNETIC FIELD ACCURACY: " + uncalibratedMagneticField.getAccuracy());
+                printSensorsValues();
             }
         });
 
@@ -144,6 +94,8 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 System.out.println("Start Record Session");
+                sensorHandler.postDelayed(sensorsRunnable, sensorHandlerDelay);
+                wifiBLeHandler.postDelayed(wifiBLeRunnable, wifiBLeHandlerDelay);
             }
         });
 
@@ -151,6 +103,8 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 System.out.println("Stop Record Session");
+                sensorHandler.removeCallbacks(sensorsRunnable);
+                wifiBLeHandler.removeCallbacks(wifiBLeRunnable);
             }
         });
 
@@ -159,4 +113,67 @@ public class HomeFragment extends Fragment {
     }
 
 
+    private void setupSensors() {
+        this.uncalibratedSensors = new ArrayList<>();
+        this.calibratedSensors = new ArrayList<>();
+        // Gyroscope
+        Sensor gyroscopeSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+        CalibratedSensor gyroscope = new Gyroscope(gyroscopeSensor);
+        SensorEventListener gyroscopeSensorListener = gyroscope.createSensorListener();
+        sensorManager.registerListener(gyroscopeSensorListener, gyroscopeSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        this.calibratedSensors.add(gyroscope);
+        // Rotation Vector
+        Sensor rotationVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+        CalibratedSensor rotationVector = new RotationVector(rotationVectorSensor);
+        SensorEventListener rotationVectorSensorListener = rotationVector.createSensorListener();
+        sensorManager.registerListener(rotationVectorSensorListener, rotationVectorSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        this.calibratedSensors.add(rotationVector);
+        // Accelerometer
+        Sensor accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        CalibratedSensor accelerometer = new Accelerometer(accelerometerSensor);
+        SensorEventListener accelerometerSensorListener = accelerometer.createSensorListener();
+        sensorManager.registerListener(accelerometerSensorListener, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        this.calibratedSensors.add(accelerometer);
+        // Geomagnetic
+        Sensor magneticFieldSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        CalibratedSensor magneticField = new MagneticField(magneticFieldSensor);
+        SensorEventListener magneticFieldSensorListener = magneticField.createSensorListener();
+        sensorManager.registerListener(magneticFieldSensorListener, magneticFieldSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        this.calibratedSensors.add(magneticField);
+        // Uncalibrated Accelerometer
+        Sensor uncalibratedAccelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER_UNCALIBRATED);
+        UncalibratedSensor uncalibratedAccelerometer = new UncalibratedAccelerometer(uncalibratedAccelerometerSensor);
+        SensorEventListener uncalibratedAccelerometerSensorListener = uncalibratedAccelerometer.createSensorListener();
+        sensorManager.registerListener(uncalibratedAccelerometerSensorListener, uncalibratedAccelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        this.uncalibratedSensors.add(uncalibratedAccelerometer);
+        // Uncalibrated GYROSCOPE
+        Sensor uncalibratedGyroscopeSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE_UNCALIBRATED);
+        UncalibratedSensor uncalibratedGyroscope = new UncalibratedGyroscope(uncalibratedGyroscopeSensor);
+        SensorEventListener uncalibratedGyroscopeSensorListener = uncalibratedGyroscope.createSensorListener();
+        sensorManager.registerListener(uncalibratedGyroscopeSensorListener, uncalibratedGyroscopeSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        this.uncalibratedSensors.add(uncalibratedGyroscope);
+        // Uncalibrated MAGNETIC FIELD
+        Sensor uncalibratedMagneticFieldSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED);
+        UncalibratedSensor uncalibratedMagneticField = new UncalibratedGyroscope(uncalibratedMagneticFieldSensor);
+        SensorEventListener uncalibratedMagneticFieldSensorListener = uncalibratedMagneticField.createSensorListener();
+        sensorManager.registerListener(uncalibratedMagneticFieldSensorListener, uncalibratedMagneticFieldSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        this.uncalibratedSensors.add(uncalibratedMagneticField);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void printSensorsValues() {
+        long time= System.currentTimeMillis();
+        System.out.println(" ---------------------------------- ");
+        this.calibratedSensors.forEach(sensor -> {
+            System.out.println(time + " " + sensor.getType() + " AXIS X: " + sensor.getAxisX() + " AXIS Y: " + sensor.getAxisY() + " AXIS Z: " + sensor.getAxisZ() + " ACCURACY: " + sensor.getAccuracy());
+        });
+        System.out.println(" ---------------------------------- ");
+        this.uncalibratedSensors.forEach(sensor -> {
+            System.out.println(time + " " + sensor.getType() + " AXIS X: " + sensor.getAxisX() + " AXIS Y: " + sensor.getAxisY()
+                    + " AXIS Z: " + sensor.getAxisZ() + " ACCURACY: " + sensor.getAccuracy()
+                    + " BIAS X: " + sensor.getBiasX() +  "BIAS Y: " + sensor.getBiasY() + " BIAS Z: " + sensor.getBiasZ());
+
+        });
+        System.out.println(" ---------------------------------- ");
+    }
 }
