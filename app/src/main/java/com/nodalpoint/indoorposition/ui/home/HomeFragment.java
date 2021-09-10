@@ -137,6 +137,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 System.out.println("Stop Record Session");
+                resetCheckpoint(currentCheckpointTextView);
                 startSessionBtn.setEnabled(true);
                 checkpointButton.setEnabled(false);
                 stopSessionBtn.setEnabled(false);
