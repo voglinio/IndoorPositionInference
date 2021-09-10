@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private MyReceiver broadcastReceiver;
     private final int MY_PERMISSIONS_ACCESS_COARSE_LOCATION = 1;
     public ArrayList<String> wifiResults = new ArrayList<String>();
-
+    public  long offset;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,7 +42,10 @@ public class MainActivity extends AppCompatActivity {
                             Manifest.permission.ACCESS_COARSE_LOCATION
                     }, MY_PERMISSIONS_ACCESS_COARSE_LOCATION);
         }
+        offset = (java.lang.System.currentTimeMillis() - android.os.SystemClock.elapsedRealtime());
 
+
+        System.out.println("-->" + (java.lang.System.currentTimeMillis() - android.os.SystemClock.elapsedRealtime()));
         configureWifiManager();
 
 

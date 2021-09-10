@@ -75,13 +75,19 @@ public class HomeFragment extends Fragment {
         @Override
         public void run() {
             // Put your code here
-            System.out.println("WIFI - BLE Data");
+            if (DEBUG) System.out.println("WIFI - BLE Data");
             ((MainActivity)getActivity()).scanWifi();
-            System.out.println("------------------- wifi start -------------------");
+            if (DEBUG) System.out.println("------------------- wifi start -------------------");
             for (String s : ((MainActivity)getActivity()).wifiResults){
                 System.out.println(s);
+                try{
+                    writer.write(s + "\n");
+                    writer.flush();
+                }catch (IOException e) {
+                    System.err.println("Cannot open file " + filename + "to write");
+                }
             }
-            System.out.println("------------------- wifi end   -------------------");
+            if (DEBUG) System.out.println("------------------- wifi end   -------------------");
 
             wifiBLeHandler.postDelayed(this, wifiBLeHandlerDelay);
         }
@@ -268,7 +274,7 @@ public class HomeFragment extends Fragment {
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void printSensorsValues() {
         long time= System.currentTimeMillis();
-        System.out.println(" ---------------------------------- ");
+        if (DEBUG) System.out.println(" ---------------------------------- ");
         this.calibratedSensors.forEach(sensor -> {
 
             if (DEBUG) System.out.println(time + " " + sensor.getType() + " AXIS X: " + sensor.getAxisX() + " AXIS Y: " + sensor.getAxisY() + " AXIS Z: " + sensor.getAxisZ() + " ACCURACY: " + sensor.getAccuracy());
@@ -280,7 +286,7 @@ public class HomeFragment extends Fragment {
             }
 
         });
-        System.out.println(" ---------------------------------- ");
+        if (DEBUG) System.out.println(" ---------------------------------- ");
         this.uncalibratedSensors.forEach(sensor -> {
             if (DEBUG) System.out.println(time + " " + sensor.getType() + " AXIS X: " + sensor.getAxisX() + " AXIS Y: " + sensor.getAxisY()
                     + " AXIS Z: " + sensor.getAxisZ() + " ACCURACY: " + sensor.getAccuracy()
@@ -297,7 +303,7 @@ public class HomeFragment extends Fragment {
             }
 
         });
-        System.out.println(" ---------------------------------- ");
+        if (DEBUG) System.out.println(" ---------------------------------- ");
     }
 
     private List<Route> setupRoutes() {

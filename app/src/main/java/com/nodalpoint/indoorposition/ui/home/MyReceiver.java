@@ -7,6 +7,8 @@ import android.net.wifi.WifiManager;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.nodalpoint.indoorposition.MainActivity;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,9 +29,11 @@ public class MyReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         results.clear();
+        long time= System.currentTimeMillis();
+
         scanResults = wifiManager.getScanResults();
         for (ScanResult scanResult : scanResults) {
-            results.add(scanResult.BSSID + "\t"  + scanResult.SSID + "\t" + scanResult.frequency + "\t" + scanResult.level + "\t" + scanResult.timestamp);
+            results.add(time + "\t" + "TYPE_WIFI" + "\t" +  scanResult.BSSID + "\t"  + scanResult.SSID + "\t" + scanResult.level + "\t" + scanResult.frequency + "\t" + scanResult.timestamp);
             //System.out.println(scanResult.BSSID + " "  + scanResult.SSID + " " + scanResult.frequency + " " + scanResult.level + " " + scanResult.timestamp);
         }
         //arrayAdapter = new ArrayAdapter(context, android.R.layout.simple_list_item_1, results);
