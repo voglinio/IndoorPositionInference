@@ -7,6 +7,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +30,13 @@ import com.nodalpoint.indoorposition.model.uncalibratedSensors.UncalibratedGyros
 import com.nodalpoint.indoorposition.model.uncalibratedSensors.UncalibratedSensor;
 import android.net.wifi.WifiManager;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +49,11 @@ public class HomeFragment extends Fragment {
     private List<Route> availableRoutes;
     private Route selectedRoute;
     private SensorManager sensorManager;
+    private String filename;
+    private FileWriter writer;
+
+    private static boolean DEBUG = false;
+
     // Sensors
     private List<CalibratedSensor> calibratedSensors = new ArrayList<>();
     private List<UncalibratedSensor> uncalibratedSensors = new ArrayList<>();
@@ -124,6 +136,49 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 System.out.println("Start Record Session");
+                Context context = getActivity().getApplicationContext();
+                try {
+                    filename = new SimpleDateFormat("'record'_yyyy_MM_dd_HH_mm_ss'.txt'").format(new Date());
+                    File file = new File(context.getExternalFilesDir(null), filename);;
+
+                    writer = new FileWriter(file);
+
+                    String manufacturer = Build.MANUFACTURER;
+                    String model = Build.MODEL;
+                    String base_os = Build.VERSION.INCREMENTAL;
+                    int sdk = Build.VERSION.PREVIEW_SDK_INT;
+                    long time= System.currentTimeMillis();
+                    writer.write("# startTime: " + time + "\n");
+                    writer.write("# SiteID:Poole House\tSiteName:Interior\tFloorId:0\tFloorName:0 \n");
+                    writer.write("# Manufacturer:" + manufacturer + "\tModel:" + model + "\tVersion: "+ base_os + "\tSDK: " + sdk + "\n");
+                    for (CalibratedSensor sensor : calibratedSensors) {
+                        writer.write("# type: " +sensor.getSensor().getType() +
+                                 "\tname : " + sensor.getSensor().getName() +
+                                "\tversion: " + sensor.getSensor().getVersion() +
+                                "\tvendor: " + sensor.getSensor().getVendor() +
+                                "\tresolution: " + sensor.getSensor().getResolution() +
+                                "\tpower: " + sensor.getSensor().getPower() +
+                                "\tmaximumRange: " + sensor.getSensor().getMaximumRange() + "\n"
+                        );
+                    };
+
+                    for (UncalibratedSensor sensor : uncalibratedSensors) {
+                        writer.write("# type: " +sensor.getSensor().getType() +
+                                "\tname : " + sensor.getSensor().getName() +
+                                "\tversion: " + sensor.getSensor().getVersion() +
+                                "\tvendor: " + sensor.getSensor().getVendor() +
+                                "\tresolution: " + sensor.getSensor().getResolution() +
+                                "\tpower: " + sensor.getSensor().getPower() +
+                                "\tmaximumRange: " + sensor.getSensor().getMaximumRange() + "\n"
+                        );
+                    };
+                    writer.flush();
+
+
+                } catch (IOException e) {
+                    System.err.println("Cannot open file " + filename + "to write");
+                }
+
                 currentCheckpointTextView.setText(currentCheckpoint.getName());
                 startSessionBtn.setEnabled(false);
                 checkpointButton.setEnabled(true);
@@ -137,6 +192,20 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 System.out.println("Stop Record Session");
+
+                Context context = getActivity().getApplicationContext();
+                try {
+
+                    if (writer != null) {
+                        writer.flush();
+                        writer.close();
+                    }
+
+                } catch (IOException e) {
+                    System.err.println("Cannot close file " + filename + " to write");
+                }
+
+
                 resetCheckpoint(currentCheckpointTextView);
                 startSessionBtn.setEnabled(true);
                 checkpointButton.setEnabled(false);
@@ -201,13 +270,31 @@ public class HomeFragment extends Fragment {
         long time= System.currentTimeMillis();
         System.out.println(" ---------------------------------- ");
         this.calibratedSensors.forEach(sensor -> {
-            System.out.println(time + " " + sensor.getType() + " AXIS X: " + sensor.getAxisX() + " AXIS Y: " + sensor.getAxisY() + " AXIS Z: " + sensor.getAxisZ() + " ACCURACY: " + sensor.getAccuracy());
+
+            if (DEBUG) System.out.println(time + " " + sensor.getType() + " AXIS X: " + sensor.getAxisX() + " AXIS Y: " + sensor.getAxisY() + " AXIS Z: " + sensor.getAxisZ() + " ACCURACY: " + sensor.getAccuracy());
+            try {
+                writer.write(time + "\t" + sensor.getType() + "\t" + sensor.getAxisX() + "\t" + sensor.getAxisY() + "\t" + sensor.getAxisZ() + " \t" + sensor.getAccuracy() + "\n");
+                writer.flush();
+            }catch (IOException e) {
+                System.err.println("Cannot write to file " + filename);
+            }
+
         });
         System.out.println(" ---------------------------------- ");
         this.uncalibratedSensors.forEach(sensor -> {
-            System.out.println(time + " " + sensor.getType() + " AXIS X: " + sensor.getAxisX() + " AXIS Y: " + sensor.getAxisY()
+            if (DEBUG) System.out.println(time + " " + sensor.getType() + " AXIS X: " + sensor.getAxisX() + " AXIS Y: " + sensor.getAxisY()
                     + " AXIS Z: " + sensor.getAxisZ() + " ACCURACY: " + sensor.getAccuracy()
                     + " BIAS X: " + sensor.getBiasX() +  "BIAS Y: " + sensor.getBiasY() + " BIAS Z: " + sensor.getBiasZ());
+
+            try {
+                writer.write(time + "\t" + sensor.getType() + "\t" + sensor.getAxisX() + "\t" + sensor.getAxisY() +
+                          "\t" + sensor.getAxisZ()  + "\t" + sensor.getBiasX() +
+                          "\t" + sensor.getBiasY() + "\t" + sensor.getBiasZ() +
+                          "\t" + sensor.getAccuracy() + "\n");
+                writer.flush();
+            }catch (IOException e) {
+                System.err.println("Cannot write to file " + filename);
+            }
 
         });
         System.out.println(" ---------------------------------- ");

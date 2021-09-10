@@ -56,5 +56,6 @@ public abstract class UncalibratedSensor {
         this.type = type;
     }
 
+    public Sensor getSensor() { return this.sensor; }
     abstract String getSensorType();
 }

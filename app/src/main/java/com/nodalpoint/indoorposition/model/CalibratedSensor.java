@@ -48,5 +48,7 @@ public abstract class CalibratedSensor {
         this.type = type;
     }
 
+    public Sensor getSensor(){return this.sensor; }
     abstract String getSensorType();
+
 }
