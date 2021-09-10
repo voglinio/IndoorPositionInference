@@ -1,6 +1,7 @@
 package com.nodalpoint.indoorposition.ui.home;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.hardware.Sensor;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import android.widget.ImageView;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
@@ -29,11 +31,16 @@ import android.net.wifi.WifiManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class HomeFragment extends Fragment {
 
     private HomeViewModel homeViewModel;
     private ImageView mCustomImage;
+    private Checkpoint currentCheckpoint;
+    private int currentCheckpointIndex = 0;
+    private List<Route> availableRoutes;
+    private Route selectedRoute;
     private SensorManager sensorManager;
     // Sensors
     private List<CalibratedSensor> calibratedSensors = new ArrayList<>();
@@ -55,7 +62,6 @@ public class HomeFragment extends Fragment {
         @RequiresApi(api = Build.VERSION_CODES.N)
         @Override
         public void run() {
-
             // Put your code here
             System.out.println("WIFI - BLE Data");
             ((MainActivity)getActivity()).scanWifi();
@@ -77,15 +83,32 @@ public class HomeFragment extends Fragment {
         homeViewModel =
                 new ViewModelProvider(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
+        availableRoutes = setupRoutes();
+        // this should be replaced by choice list
+        selectedRoute = availableRoutes.get(0);
+        currentCheckpointIndex = 0;
+        currentCheckpoint = selectedRoute.getCheckpoints().get(currentCheckpointIndex);
 
         // Setup Managers
         sensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         setupSensors();
-        Button button = (Button) root.findViewById(R.id.record_button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
+
+        TextView currentCheckpointTextView = (TextView) root.findViewById(R.id.checkpoint);
+        currentCheckpointTextView.setText("-");
+        Button checkpointButton = (Button) root.findViewById(R.id.record_button);
+        checkpointButton.setTypeface(checkpointButton.getTypeface(), Typeface.BOLD);
+        checkpointButton.setEnabled(false);
+        checkpointButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                printSensorsValues();
+                currentCheckpointIndex ++;
+                currentCheckpoint = selectedRoute.getCheckpoints().get(currentCheckpointIndex);
+                System.out.println("CHECKPOINT " + currentCheckpoint.getName());
+                if(currentCheckpointIndex + 2 > selectedRoute.getCheckpoints().size()) {
+                    checkpointButton.setEnabled(false);
+                    currentCheckpointTextView.setText("Checkpoint " + currentCheckpoint.getName() + " End of Route");
+                } else {
+                    currentCheckpointTextView.setText("Checkpoint " + currentCheckpoint.getName());
+                }
             }
         });
 
@@ -94,14 +117,17 @@ public class HomeFragment extends Fragment {
 
         FloatingActionButton startSessionBtn = (FloatingActionButton) root.findViewById(R.id.start_session);
         FloatingActionButton stopSessionBtn = (FloatingActionButton) root.findViewById(R.id.stop_session);
-
-
+        stopSessionBtn.setEnabled(false);
 
 
         startSessionBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 System.out.println("Start Record Session");
+                currentCheckpointTextView.setText(currentCheckpoint.getName());
+                startSessionBtn.setEnabled(false);
+                checkpointButton.setEnabled(true);
+                stopSessionBtn.setEnabled(true);
                 sensorHandler.postDelayed(sensorsRunnable, sensorHandlerDelay);
                 wifiBLeHandler.postDelayed(wifiBLeRunnable, wifiBLeHandlerDelay);
             }
@@ -111,13 +137,14 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 System.out.println("Stop Record Session");
+                startSessionBtn.setEnabled(true);
+                checkpointButton.setEnabled(false);
+                stopSessionBtn.setEnabled(false);
                 sensorHandler.removeCallbacks(sensorsRunnable);
                 wifiBLeHandler.removeCallbacks(wifiBLeRunnable);
             }
         });
-
         return root;
-
     }
 
 
@@ -183,5 +210,33 @@ public class HomeFragment extends Fragment {
 
         });
         System.out.println(" ---------------------------------- ");
+    }
+
+    private List<Route> setupRoutes() {
+        Map<Integer, Checkpoint> availableCheckpoints = Checkpoint.generatePoints();
+        List<Route> routes = new ArrayList<>();
+        List<Checkpoint> route1Checkpoints = new ArrayList<Checkpoint>(){
+            {add(availableCheckpoints.get(0));}
+            {add(availableCheckpoints.get(1));}
+            {add(availableCheckpoints.get(2));}
+            {add(availableCheckpoints.get(3));}
+            {add(availableCheckpoints.get(4));}
+            {add(availableCheckpoints.get(5));}
+            {add(availableCheckpoints.get(6));}
+            {add(availableCheckpoints.get(7));}
+            {add(availableCheckpoints.get(8));}
+            {add(availableCheckpoints.get(9));}
+            {add(availableCheckpoints.get(10));}
+        };
+        routes.add(new Route(route1Checkpoints));
+
+
+
+        return routes;
+    }
+
+    private void resetCheckpoint(TextView currentCheckpointTextView) {
+        currentCheckpointIndex = 0;
+        currentCheckpointTextView.setText("-");
     }
 }
