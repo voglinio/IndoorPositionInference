@@ -12,10 +12,8 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.*;
 
-import android.widget.ImageView;
-import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
@@ -39,12 +37,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class HomeFragment extends Fragment {
 
     private HomeViewModel homeViewModel;
     private ImageView mCustomImage;
+    private Spinner routesSpinner;
     private Checkpoint currentCheckpoint;
+    private Checkpoint nextCheckpoint;
     private int currentCheckpointIndex = 0;
     private List<Route> availableRoutes;
     private Route selectedRoute;
@@ -101,18 +102,41 @@ public class HomeFragment extends Fragment {
         homeViewModel =
                 new ViewModelProvider(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
-        availableRoutes = setupRoutes();
+        // Setup spinner
+        routesSpinner = (Spinner) root.findViewById(R.id.routes_spinner);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            availableRoutes = setupRoutes();
+        }
+        routesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                System.out.println("POSITION");
+                System.out.println(position);
+                selectedRoute = availableRoutes.get(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
         // this should be replaced by choice list
         selectedRoute = availableRoutes.get(0);
         currentCheckpointIndex = 0;
         currentCheckpoint = selectedRoute.getCheckpoints().get(currentCheckpointIndex);
-
+        nextCheckpoint = selectedRoute.getCheckpoints().size() > 2
+                ?  selectedRoute.getCheckpoints().get(currentCheckpointIndex + 1)
+                :  selectedRoute.getCheckpoints().get(currentCheckpointIndex);
         // Setup Managers
         sensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         setupSensors();
 
+
+
         TextView currentCheckpointTextView = (TextView) root.findViewById(R.id.checkpoint);
         currentCheckpointTextView.setText("-");
+        TextView nextCheckpointTextView = (TextView) root.findViewById(R.id.next_checkpoint);
+        nextCheckpointTextView.setText("-");
         Button checkpointButton = (Button) root.findViewById(R.id.record_button);
         checkpointButton.setTypeface(checkpointButton.getTypeface(), Typeface.BOLD);
         checkpointButton.setEnabled(false);
@@ -123,9 +147,13 @@ public class HomeFragment extends Fragment {
                 System.out.println("CHECKPOINT " + currentCheckpoint.getName());
                 if(currentCheckpointIndex + 2 > selectedRoute.getCheckpoints().size()) {
                     checkpointButton.setEnabled(false);
-                    currentCheckpointTextView.setText("Checkpoint " + currentCheckpoint.getName() + " End of Route");
+                    currentCheckpointTextView.setText("Current Checkpoint " + currentCheckpoint.getName() + " End of Route");
+                    nextCheckpoint = null;
+                    nextCheckpointTextView.setText("-");
                 } else {
-                    currentCheckpointTextView.setText("Checkpoint " + currentCheckpoint.getName());
+                    currentCheckpointTextView.setText("Current Checkpoint " + currentCheckpoint.getName());
+                    nextCheckpoint = selectedRoute.getCheckpoints().get(currentCheckpointIndex + 1);
+                    nextCheckpointTextView.setText("Next Checkpoint " + nextCheckpoint.getName());
                 }
             }
         });
@@ -186,9 +214,12 @@ public class HomeFragment extends Fragment {
                 }
 
                 currentCheckpointTextView.setText(currentCheckpoint.getName());
+                currentCheckpointTextView.setText("Current Checkpoint " + currentCheckpoint.getName());
+                nextCheckpointTextView.setText("Next Checkpoint " + nextCheckpoint.getName());
                 startSessionBtn.setEnabled(false);
                 checkpointButton.setEnabled(true);
                 stopSessionBtn.setEnabled(true);
+                routesSpinner.setEnabled(false);
                 sensorHandler.postDelayed(sensorsRunnable, sensorHandlerDelay);
                 wifiBLeHandler.postDelayed(wifiBLeRunnable, wifiBLeHandlerDelay);
             }
@@ -213,9 +244,11 @@ public class HomeFragment extends Fragment {
 
 
                 resetCheckpoint(currentCheckpointTextView);
+                resetCheckpoint(currentCheckpointTextView,nextCheckpointTextView);
                 startSessionBtn.setEnabled(true);
                 checkpointButton.setEnabled(false);
                 stopSessionBtn.setEnabled(false);
+                routesSpinner.setEnabled(true);
                 sensorHandler.removeCallbacks(sensorsRunnable);
                 wifiBLeHandler.removeCallbacks(wifiBLeRunnable);
             }
@@ -306,6 +339,7 @@ public class HomeFragment extends Fragment {
         if (DEBUG) System.out.println(" ---------------------------------- ");
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private List<Route> setupRoutes() {
         Map<Integer, Checkpoint> availableCheckpoints = Checkpoint.generatePoints();
         List<Route> routes = new ArrayList<>();
@@ -322,15 +356,33 @@ public class HomeFragment extends Fragment {
             {add(availableCheckpoints.get(9));}
             {add(availableCheckpoints.get(10));}
         };
-        routes.add(new Route(route1Checkpoints));
+        routes.add(new Route(route1Checkpoints, "Route 1"));
+
+        List<Checkpoint> route2Checkpoints = new ArrayList<Checkpoint>(){
+            {add(availableCheckpoints.get(0));}
+            {add(availableCheckpoints.get(2));}
+            {add(availableCheckpoints.get(3));}
+            {add(availableCheckpoints.get(9));}
+            {add(availableCheckpoints.get(10));}
+            {add(availableCheckpoints.get(9));}
+            {add(availableCheckpoints.get(4));}
+            {add(availableCheckpoints.get(6));}
+            {add(availableCheckpoints.get(8));}
+            {add(availableCheckpoints.get(9));}
+            {add(availableCheckpoints.get(10));}
+        };
+        routes.add(new Route(route2Checkpoints, "Route 2"));
 
 
-
+        ArrayAdapter<String> routesAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, routes.stream().map(Route::getName).collect(Collectors.toList()));
+        routesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        routesSpinner.setAdapter(routesAdapter);
         return routes;
     }
 
-    private void resetCheckpoint(TextView currentCheckpointTextView) {
+    private void resetCheckpoint(TextView currentCheckpointTextView, TextView nextCheckpointTextView) {
         currentCheckpointIndex = 0;
         currentCheckpointTextView.setText("-");
+        nextCheckpointTextView.setText("-");
     }
 }

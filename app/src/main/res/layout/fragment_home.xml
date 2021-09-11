@@ -15,30 +15,30 @@
             android:layout_margin="5dp"
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginTop="229dp"
-            android:layout_marginEnd="4dp"
-            android:layout_marginRight="4dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginLeft="4dp"
-            android:layout_marginStart="4dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginBottom="678dp"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintVertical_bias="0.25"/>
+            app:layout_constraintVertical_bias="0.419"/>
 
     <ImageView
             android:src="@drawable/groundfloor"
-            android:layout_width="377dp"
-            android:layout_height="444dp"
+            android:layout_width="match_parent"
+            android:layout_height="376dp"
             android:id="@+id/floorPlan"
-            android:layout_marginTop="48dp"
+            android:layout_marginTop="10dp"
             app:layout_constraintTop_toBottomOf="@+id/record_button"
-            android:layout_marginEnd="19dp"
-            android:layout_marginRight="19dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
             app:layout_constraintHorizontal_bias="0.0"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -48,7 +48,7 @@
             android:clickable="true"
             android:id="@+id/start_session"
             app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="28dp"
+            android:layout_marginTop="70dp"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginLeft="52dp"
             android:layout_marginStart="52dp"/>
@@ -60,7 +60,7 @@
             android:clickable="true"
             android:id="@+id/stop_session"
             app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="28dp"
+            android:layout_marginTop="70dp"
             android:layout_marginEnd="52dp"
             android:layout_marginRight="52dp"
             app:layout_constraintEnd_toEndOf="parent"/>
@@ -72,15 +72,44 @@
             android:id="@+id/checkpoint"
             android:gravity="center"
             app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="127dp"
+            android:layout_marginTop="87dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginBottom="27dp"
             app:layout_constraintBottom_toTopOf="@+id/record_button"
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
             android:layout_marginRight="10dp"
-            android:textSize="30sp"
+            android:textSize="14sp"
             android:layout_marginEnd="10dp"/>
+
+    <TextView
+            android:text="-"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/next_checkpoint"
+            android:layout_marginTop="20dp"
+            app:layout_constraintTop_toBottomOf="@+id/checkpoint"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"/>
+
+    <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/routes_spinner"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="10dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

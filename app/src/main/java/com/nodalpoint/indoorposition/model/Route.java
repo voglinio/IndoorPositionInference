@@ -10,9 +10,11 @@ import java.util.List;
 public class Route {
 
     private List<Checkpoint> checkpoints;
+    private String name;
 
-    public Route(List<Checkpoint> checkpoints) {
+    public Route(List<Checkpoint> checkpoints, String name) {
         this.checkpoints = checkpoints;
+        this.name = name;
     }
 
     public void addItem(Checkpoint item) {
