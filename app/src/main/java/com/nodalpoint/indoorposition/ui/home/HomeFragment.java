@@ -46,6 +46,8 @@ public class HomeFragment extends Fragment {
     private Spinner routesSpinner;
     private Checkpoint currentCheckpoint;
     private Checkpoint nextCheckpoint;
+    private TextView currentCheckpointTextView;
+    private TextView nextCheckpointTextView;
     private int currentCheckpointIndex = 0;
     private List<Route> availableRoutes;
     private Route selectedRoute;
@@ -110,9 +112,8 @@ public class HomeFragment extends Fragment {
         routesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                System.out.println("POSITION");
-                System.out.println(position);
                 selectedRoute = availableRoutes.get(position);
+                setupCheckpoints(selectedRoute, currentCheckpointIndex);
             }
 
             @Override
@@ -123,19 +124,16 @@ public class HomeFragment extends Fragment {
         // this should be replaced by choice list
         selectedRoute = availableRoutes.get(0);
         currentCheckpointIndex = 0;
-        currentCheckpoint = selectedRoute.getCheckpoints().get(currentCheckpointIndex);
-        nextCheckpoint = selectedRoute.getCheckpoints().size() > 2
-                ?  selectedRoute.getCheckpoints().get(currentCheckpointIndex + 1)
-                :  selectedRoute.getCheckpoints().get(currentCheckpointIndex);
+        setupCheckpoints(selectedRoute, currentCheckpointIndex);
         // Setup Managers
         sensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         setupSensors();
 
 
 
-        TextView currentCheckpointTextView = (TextView) root.findViewById(R.id.checkpoint);
+        currentCheckpointTextView = (TextView) root.findViewById(R.id.checkpoint);
         currentCheckpointTextView.setText("-");
-        TextView nextCheckpointTextView = (TextView) root.findViewById(R.id.next_checkpoint);
+        nextCheckpointTextView = (TextView) root.findViewById(R.id.next_checkpoint);
         nextCheckpointTextView.setText("-");
         Button checkpointButton = (Button) root.findViewById(R.id.record_button);
         checkpointButton.setTypeface(checkpointButton.getTypeface(), Typeface.BOLD);
@@ -242,8 +240,6 @@ public class HomeFragment extends Fragment {
                     System.err.println("Cannot close file " + filename + " to write");
                 }
 
-
-                resetCheckpoint(currentCheckpointTextView);
                 resetCheckpoint(currentCheckpointTextView,nextCheckpointTextView);
                 startSessionBtn.setEnabled(true);
                 checkpointButton.setEnabled(false);
@@ -384,5 +380,12 @@ public class HomeFragment extends Fragment {
         currentCheckpointIndex = 0;
         currentCheckpointTextView.setText("-");
         nextCheckpointTextView.setText("-");
+    }
+
+    private void setupCheckpoints(Route selectedRoute, int currentCheckpointIndex) {
+        currentCheckpoint = selectedRoute.getCheckpoints().get(currentCheckpointIndex);
+        nextCheckpoint = selectedRoute.getCheckpoints().size() > 2
+                ?  selectedRoute.getCheckpoints().get(currentCheckpointIndex + 1)
+                :  selectedRoute.getCheckpoints().get(currentCheckpointIndex);
     }
 }
