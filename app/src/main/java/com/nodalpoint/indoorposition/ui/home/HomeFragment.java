@@ -7,7 +7,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,12 +25,10 @@ import com.nodalpoint.indoorposition.model.*;
 import com.nodalpoint.indoorposition.model.uncalibratedSensors.UncalibratedAccelerometer;
 import com.nodalpoint.indoorposition.model.uncalibratedSensors.UncalibratedGyroscope;
 import com.nodalpoint.indoorposition.model.uncalibratedSensors.UncalibratedSensor;
-import android.net.wifi.WifiManager;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -54,6 +51,7 @@ public class HomeFragment extends Fragment {
     private SensorManager sensorManager;
     private String filename;
     private FileWriter writer;
+    private ListView wifiList;
 
     private static boolean DEBUG = false;
 
@@ -77,7 +75,6 @@ public class HomeFragment extends Fragment {
         @RequiresApi(api = Build.VERSION_CODES.N)
         @Override
         public void run() {
-            // Put your code here
             if (DEBUG) System.out.println("WIFI - BLE Data");
             ((MainActivity)getActivity()).scanWifi();
             if (DEBUG) System.out.println("------------------- wifi start -------------------");
@@ -90,6 +87,8 @@ public class HomeFragment extends Fragment {
                     System.err.println("Cannot open file " + filename + "to write");
                 }
             }
+            ArrayAdapter<String> wifiArray = new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, ((MainActivity)getActivity()).getWifiResults());
+            wifiList.setAdapter(wifiArray);
             if (DEBUG) System.out.println("------------------- wifi end   -------------------");
 
             wifiBLeHandler.postDelayed(this, wifiBLeHandlerDelay);
@@ -129,7 +128,7 @@ public class HomeFragment extends Fragment {
         sensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         setupSensors();
 
-
+        wifiList = root.findViewById(R.id.wifi_list);
 
         currentCheckpointTextView = (TextView) root.findViewById(R.id.checkpoint);
         currentCheckpointTextView.setText("-");
@@ -143,6 +142,14 @@ public class HomeFragment extends Fragment {
                 currentCheckpointIndex ++;
                 currentCheckpoint = selectedRoute.getCheckpoints().get(currentCheckpointIndex);
                 System.out.println("CHECKPOINT " + currentCheckpoint.getName());
+                long time= System.currentTimeMillis();
+                try{
+                    writer.write(time + "\t" + "TYPE_CHECKPOINT" + "\t" + currentCheckpoint.getName() + "\n");
+                    writer.flush();
+                }catch (IOException e) {
+                    System.err.println("Cannot open file " + filename + "to write");
+                }
+
                 if(currentCheckpointIndex + 2 > selectedRoute.getCheckpoints().size()) {
                     checkpointButton.setEnabled(false);
                     currentCheckpointTextView.setText("Current Checkpoint " + currentCheckpoint.getName() + " End of Route");
@@ -240,6 +247,8 @@ public class HomeFragment extends Fragment {
                     System.err.println("Cannot close file " + filename + " to write");
                 }
 
+                ArrayAdapter<String> wifiArray = new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, new ArrayList<String>());
+                wifiList.setAdapter(wifiArray);
                 resetCheckpoint(currentCheckpointTextView,nextCheckpointTextView);
                 startSessionBtn.setEnabled(true);
                 checkpointButton.setEnabled(false);

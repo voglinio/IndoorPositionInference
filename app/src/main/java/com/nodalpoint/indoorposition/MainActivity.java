@@ -21,14 +21,17 @@ import android.os.Bundle;
 import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.pm.PackageManager;
+import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private WifiManager wifiManager;
     private MyReceiver broadcastReceiver;
     private final int MY_PERMISSIONS_ACCESS_COARSE_LOCATION = 1;
-    public ArrayList<String> wifiResults = new ArrayList<String>();
+    @Getter
+    public List<String> wifiResults = new ArrayList<String>();
     public  long offset;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         super.onPostResume();
-        broadcastReceiver = new MyReceiver(wifiManager, wifiResults);
+        broadcastReceiver = new MyReceiver(wifiManager, getWifiResults());
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
         registerReceiver(broadcastReceiver, intentFilter);

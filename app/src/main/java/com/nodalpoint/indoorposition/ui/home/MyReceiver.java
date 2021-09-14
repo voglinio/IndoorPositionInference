@@ -4,28 +4,28 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import androidx.annotation.RequiresApi;
 import com.nodalpoint.indoorposition.MainActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MyReceiver extends BroadcastReceiver {
-    private WifiManager wifiManager;
+    private final WifiManager wifiManager;
     private List<ScanResult> scanResults;
-    private ArrayAdapter arrayAdapter;
-    private ArrayList results;// = new ArrayList<String>();
+    private final List<String> results;// = new ArrayList<String>();
 
-    public MyReceiver(WifiManager wifiManager, ArrayList results) {
-
+    public MyReceiver(WifiManager wifiManager, List<String> results) {
         this.wifiManager = wifiManager;
         this.results = results;
-
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     public void onReceive(Context context, Intent intent) {
         results.clear();
