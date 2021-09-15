@@ -23,6 +23,7 @@ import com.nodalpoint.indoorposition.R;
 import com.nodalpoint.indoorposition.model.*;
 import com.nodalpoint.indoorposition.model.uncalibratedSensors.UncalibratedAccelerometer;
 import com.nodalpoint.indoorposition.model.uncalibratedSensors.UncalibratedGyroscope;
+import com.nodalpoint.indoorposition.model.uncalibratedSensors.UncalibratedMagneticField;
 import com.nodalpoint.indoorposition.model.uncalibratedSensors.UncalibratedSensor;
 
 import java.io.File;
@@ -263,7 +264,7 @@ public class HomeFragment extends Fragment {
         this.uncalibratedSensors.add(uncalibratedGyroscope);
         // Uncalibrated MAGNETIC FIELD
         Sensor uncalibratedMagneticFieldSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED);
-        UncalibratedSensor uncalibratedMagneticField = new UncalibratedGyroscope(uncalibratedMagneticFieldSensor);
+        UncalibratedSensor uncalibratedMagneticField = new UncalibratedMagneticField(uncalibratedMagneticFieldSensor);
         SensorEventListener uncalibratedMagneticFieldSensorListener = uncalibratedMagneticField.createSensorListener();
         sensorManager.registerListener(uncalibratedMagneticFieldSensorListener, uncalibratedMagneticFieldSensor, SensorManager.SENSOR_DELAY_NORMAL);
         this.uncalibratedSensors.add(uncalibratedMagneticField);
@@ -327,7 +328,7 @@ public class HomeFragment extends Fragment {
         for (int i=0; i<rowsCount; i++){
             LinearLayout rowLayout = new LinearLayout(getContext());
             rowLayout.setOrientation(LinearLayout.HORIZONTAL);
-            int rowSize = rowsCount == i+1 ? neighbours.size() % 3 : 3;
+            int rowSize = ((rowsCount == i+1) & (neighbours.size() % 3 != 0)) ? neighbours.size() % 3 : 3;
             for (int j=0; j < rowSize; j++) {
                 Checkpoint chk = neighbours.get(j + 3*i);
                 Button btn = new Button(getContext());
