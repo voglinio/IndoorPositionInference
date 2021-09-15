@@ -110,9 +110,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onPostResume() {
         System.out.println("onPostResume");
 
-
         super.onPostResume();
-        broadcastReceiver = new MyReceiver(wifiManager, getWifiResults());
+        broadcastReceiver = new MyReceiver(wifiManager, getWifiResults(), offset);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
         registerReceiver(broadcastReceiver, intentFilter);
