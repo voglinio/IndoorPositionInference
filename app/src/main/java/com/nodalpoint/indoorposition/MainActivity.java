@@ -1,23 +1,17 @@
 package com.nodalpoint.indoorposition;
 
-import android.app.Fragment;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.nodalpoint.indoorposition.ui.home.HomeFragment;
+import android.view.LayoutInflater;
+import android.view.View;
 import com.nodalpoint.indoorposition.ui.home.MyReceiver;
 import androidx.core.app.ActivityCompat;
 import android.content.IntentFilter;
 import android.content.Context;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 import android.os.Build;
-import android.os.Bundle;
 import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -54,7 +48,23 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-
+        androidx.appcompat.app.ActionBar actionbar = getSupportActionBar();
+        actionbar.setDisplayShowTitleEnabled(false);
+        actionbar.setDisplayShowCustomEnabled(true);
+        LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = layoutInflater.inflate(R.layout.logo_layout, null);
+        actionbar.setCustomView(view);
+//        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)
+//                != PackageManager.PERMISSION_GRANTED) {
+//            ActivityCompat.requestPermissions(
+//                    MainActivity.this, new String[]{
+//                            Manifest.permission.ACCESS_COARSE_LOCATION
+//                    }, MY_PERMISSIONS_ACCESS_COARSE_LOCATION);
+//
+//
+//        } else {
+//            scanWifi();
+//        }
     }
 
 

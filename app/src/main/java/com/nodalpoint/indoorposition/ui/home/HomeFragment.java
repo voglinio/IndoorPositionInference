@@ -1,6 +1,7 @@
 package com.nodalpoint.indoorposition.ui.home;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
@@ -323,19 +324,22 @@ public class HomeFragment extends Fragment {
     private void setupNeighbours(Checkpoint checkpoint){
         List<Checkpoint> neighbours = checkpoint.getNeighbours();
         linearLayout.removeAllViews();
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         int rowsCount = neighbours.size() % 3 > 0 ?  (neighbours.size() / 3) + 1 : (neighbours.size() / 3);
         for (int i=0; i<rowsCount; i++){
             LinearLayout rowLayout = new LinearLayout(getContext());
             rowLayout.setOrientation(LinearLayout.HORIZONTAL);
             int rowSize = ((rowsCount == i+1) & (neighbours.size() % 3 != 0)) ? neighbours.size() % 3 : 3;
             for (int j=0; j < rowSize; j++) {
+                LinearLayout btnLayout = new LinearLayout(getContext());
+                btnLayout.setOrientation(LinearLayout.VERTICAL);
+                btnLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT, 0.33333f));
                 Checkpoint chk = neighbours.get(j + 3*i);
                 Button btn = new Button(getContext());
                 btn.setText(chk.getName());
                 btn.setWidth(250);
                 btn.setHeight(250);
-                btn.setTextSize(20);
+                btn.setTextSize(25);
                 btn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -353,7 +357,9 @@ public class HomeFragment extends Fragment {
                         setupNeighbours(currentCheckpoint);
                     }
                 });
-                rowLayout.addView(btn, lp);
+                btnLayout.addView(btn);
+                lp.setMargins(20,10,20,10);
+                rowLayout.addView(btnLayout);
             }
             linearLayout.addView(rowLayout, lp);
         }
