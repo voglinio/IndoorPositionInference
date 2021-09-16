@@ -97,11 +97,13 @@ public class Checkpoint {
             {
                 add(new Checkpoint("10", 10));
                 add(new Checkpoint("12", 12));
+                add(new Checkpoint("17", 17));
             }}));
         checkpoints.put(12, new Checkpoint("12", 12, new ArrayList<Checkpoint>() {
             {
                 add(new Checkpoint("11", 11));
                 add(new Checkpoint("13", 13));
+                add(new Checkpoint("17", 17));
             }}));
         checkpoints.put(13, new Checkpoint("13", 13, new ArrayList<Checkpoint>() {
             {
@@ -124,6 +126,7 @@ public class Checkpoint {
             }}));
         checkpoints.put(17, new Checkpoint("17", 17, new ArrayList<Checkpoint>() {
             {
+                add(new Checkpoint("11", 11));
                 add(new Checkpoint("12", 12));
                 add(new Checkpoint("18", 18));
             }}));
@@ -138,6 +141,7 @@ public class Checkpoint {
             }}));
         checkpoints.put(21, new Checkpoint("21", 21, new ArrayList<Checkpoint>() {
             {
+                add(new Checkpoint("16", 16));
                 add(new Checkpoint("22", 22));
                 add(new Checkpoint("43", 43));
             }}));
@@ -187,7 +191,7 @@ public class Checkpoint {
             {
                 add(new Checkpoint("28", 28));
                 add(new Checkpoint("31", 31));
-                add(new Checkpoint("39", 39));
+                add(new Checkpoint("34", 34));
             }}));
         checkpoints.put(31, new Checkpoint("31", 31, new ArrayList<Checkpoint>() {
             {
@@ -471,29 +475,38 @@ public class Checkpoint {
             }}));
         checkpoints.put(70, new Checkpoint("70", 70, new ArrayList<Checkpoint>() {
             {
-                add(new Checkpoint("66", 66));
+                add(new Checkpoint("65", 65));
                 add(new Checkpoint("66", 66));
                 add(new Checkpoint("69", 69));
                 add(new Checkpoint("71", 71));
+                add(new Checkpoint("72", 72));
                 add(new Checkpoint("73", 73));
             }}));
         checkpoints.put(71, new Checkpoint("71", 71, new ArrayList<Checkpoint>() {
             {
                 add(new Checkpoint("65", 65));
                 add(new Checkpoint("70", 70));
+                add(new Checkpoint("72", 72));
             }}));
         checkpoints.put(72, new Checkpoint("72", 72, new ArrayList<Checkpoint>() {
             {
+                add(new Checkpoint("70", 70));
+                add(new Checkpoint("71", 71));
+                add(new Checkpoint("73", 73));
+                add(new Checkpoint("74", 74));
+                add(new Checkpoint("75", 75));
             }}));
         checkpoints.put(73, new Checkpoint("73", 73, new ArrayList<Checkpoint>() {
             {
                 add(new Checkpoint("70", 70));
+                add(new Checkpoint("72", 72));
                 add(new Checkpoint("74", 74));
                 add(new Checkpoint("75", 75));
             }}));
         checkpoints.put(74, new Checkpoint("74", 74, new ArrayList<Checkpoint>() {
             {
-                add(new Checkpoint("74", 74));
+                add(new Checkpoint("72", 72));
+                add(new Checkpoint("73", 73));
                 add(new Checkpoint("75", 75));
                 add(new Checkpoint("78", 78));
                 add(new Checkpoint("79", 79));
@@ -501,8 +514,10 @@ public class Checkpoint {
             }}));
         checkpoints.put(75, new Checkpoint("75", 75, new ArrayList<Checkpoint>() {
             {
+                add(new Checkpoint("72", 72));
+                add(new Checkpoint("73", 73));
                 add(new Checkpoint("74", 74));
-                add(new Checkpoint("75", 75));
+                add(new Checkpoint("76", 76));
                 add(new Checkpoint("77", 77));
                 add(new Checkpoint("78", 78));
                 add(new Checkpoint("79", 79));
