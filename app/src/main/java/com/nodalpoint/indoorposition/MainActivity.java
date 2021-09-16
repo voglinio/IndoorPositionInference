@@ -54,17 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-//        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)
-//                != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(
-//                    MainActivity.this, new String[]{
-//                            Manifest.permission.ACCESS_COARSE_LOCATION
-//                    }, MY_PERMISSIONS_ACCESS_COARSE_LOCATION);
-//
-//
-//        } else {
-//            scanWifi();
-//        }
+
     }
 
 
