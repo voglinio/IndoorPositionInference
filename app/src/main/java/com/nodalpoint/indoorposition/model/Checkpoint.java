@@ -44,7 +44,7 @@ public class Checkpoint {
             }}));
         checkpoints.put(1, new Checkpoint("1", 1, new ArrayList<Checkpoint>() {
             {
-                add(new Checkpoint("1", 1));
+                add(new Checkpoint("2", 2));
                 add(new Checkpoint("20", 20));
             }}));
         checkpoints.put(2, new Checkpoint("2", 2, new ArrayList<Checkpoint>() {
