@@ -1,5 +1,6 @@
 package com.nodalpoint.indoorposition;
 
+import android.media.MediaPlayer;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 
@@ -27,11 +28,15 @@ public class MainActivity extends AppCompatActivity {
     @Getter
     public List<String> wifiResults = new ArrayList<String>();
     public  long offset;
+    public MediaPlayer mediaPlayer;
+    public MediaPlayer mediaPlayerIntro;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
+        //mediaPlayer =  MediaPlayer.create(this, R.raw.hehe);
+        //mediaPlayerIntro =  MediaPlayer.create(this, R.raw.intro);
         if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(
@@ -65,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
 //        } else {
 //            scanWifi();
 //        }
+
+        //mediaPlayerIntro.start();
     }
 
 

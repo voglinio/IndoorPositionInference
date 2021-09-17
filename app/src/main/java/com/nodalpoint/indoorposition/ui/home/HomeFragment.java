@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -54,6 +55,7 @@ public class HomeFragment extends Fragment {
     private boolean recordSession = false;
 
     private static boolean DEBUG = false;
+
 
     // Sensors
     private List<CalibratedSensor> calibratedSensors = new ArrayList<>();
@@ -344,6 +346,8 @@ public class HomeFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         if(!recordSession) { return; }
+                        //((MainActivity)getActivity()).mediaPlayer.start();
+
                         currentCheckpoint = availableCheckpoints.get(chk.getId());
                         currentCheckpointTextView.setText("Last Checkpoint " + currentCheckpoint.getName());
                         System.out.println("CHECKPOINT " + currentCheckpoint.getName());

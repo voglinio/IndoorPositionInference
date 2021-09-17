@@ -396,6 +396,7 @@ public class Checkpoint {
                 add(new Checkpoint("56", 56));
                 add(new Checkpoint("57", 57));
                 add(new Checkpoint("59", 59));
+                add(new Checkpoint("64", 64));
             }}));
         checkpoints.put(59, new Checkpoint("59", 59, new ArrayList<Checkpoint>() {
             {
