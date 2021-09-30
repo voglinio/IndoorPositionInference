@@ -78,12 +78,22 @@ public class HomeFragment extends Fragment {
         @Override
         public void run() {
             if (DEBUG) System.out.println("WIFI - BLE Data");
+
             ((MainActivity)getActivity()).scanWifi();
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             if (DEBUG) System.out.println("------------------- wifi start -------------------");
+            long time =  System.currentTimeMillis();
+            Date date =new Date(time);
+
             for (String s : ((MainActivity)getActivity()).wifiResults){
-                System.out.println(s);
+                System.out.println(date.toString() + "\t"  + s);
                 try{
-                    writer.write(s + "\n");
+                    writer.write(time + "\t" + s + "\n");
                     writer.flush();
                 }catch (IOException e) {
                     System.err.println("Cannot open file " + filename + "to write");

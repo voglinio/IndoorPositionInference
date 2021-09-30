@@ -59,19 +59,7 @@ public class MainActivity extends AppCompatActivity {
         LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.logo_layout, null);
         actionbar.setCustomView(view);
-//        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)
-//                != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(
-//                    MainActivity.this, new String[]{
-//                            Manifest.permission.ACCESS_COARSE_LOCATION
-//                    }, MY_PERMISSIONS_ACCESS_COARSE_LOCATION);
-//
-//
-//        } else {
-//            scanWifi();
-//        }
 
-        //mediaPlayerIntro.start();
     }
 
 
@@ -85,9 +73,10 @@ public class MainActivity extends AppCompatActivity {
                         MY_PERMISSIONS_ACCESS_COARSE_LOCATION);
             } else {
                 //Toast.makeText(MainActivity.this, "location turned on", Toast.LENGTH_SHORT).show();
-                System.out.println("location turned on");
                 registerReceiver(broadcastReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-                wifiManager.startScan();
+                boolean started = wifiManager.startScan();
+                System.out.println("location turned on " + started);
+
             }
         } else {
             System.out.println("scanning");
