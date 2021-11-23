@@ -1,11 +1,9 @@
-package com.nodalpoint.indoorposition.ui.home;
+package com.nodalpoint.indoorpositioninference.ui.home;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,13 +18,13 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.nodalpoint.indoorposition.MainActivity;
-import com.nodalpoint.indoorposition.R;
-import com.nodalpoint.indoorposition.model.*;
-import com.nodalpoint.indoorposition.model.uncalibratedSensors.UncalibratedAccelerometer;
-import com.nodalpoint.indoorposition.model.uncalibratedSensors.UncalibratedGyroscope;
-import com.nodalpoint.indoorposition.model.uncalibratedSensors.UncalibratedMagneticField;
-import com.nodalpoint.indoorposition.model.uncalibratedSensors.UncalibratedSensor;
+import com.nodalpoint.indoorpositioninference.MainActivity;
+import com.nodalpoint.indoorpositioninference.R;
+import com.nodalpoint.indoorpositioninference.model.*;
+import com.nodalpoint.indoorpositioninference.model.uncalibratedSensors.UncalibratedAccelerometer;
+import com.nodalpoint.indoorpositioninference.model.uncalibratedSensors.UncalibratedGyroscope;
+import com.nodalpoint.indoorpositioninference.model.uncalibratedSensors.UncalibratedMagneticField;
+import com.nodalpoint.indoorpositioninference.model.uncalibratedSensors.UncalibratedSensor;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -37,7 +35,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class HomeFragment extends Fragment {
 

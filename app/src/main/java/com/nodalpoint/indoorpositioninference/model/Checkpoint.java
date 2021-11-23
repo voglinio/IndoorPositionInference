@@ -1,4 +1,4 @@
-package com.nodalpoint.indoorposition.model;
+package com.nodalpoint.indoorpositioninference.model;
 
 import lombok.Getter;
 

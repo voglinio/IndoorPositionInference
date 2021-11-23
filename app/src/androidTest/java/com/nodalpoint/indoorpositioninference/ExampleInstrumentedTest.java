@@ -1,4 +1,4 @@
-package com.nodalpoint.indoorposition;
+package com.nodalpoint.indoorpositioninference;
 
 import android.content.Context;
 

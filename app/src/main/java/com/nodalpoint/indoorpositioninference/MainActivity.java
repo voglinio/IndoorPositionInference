@@ -1,4 +1,4 @@
-package com.nodalpoint.indoorposition;
+package com.nodalpoint.indoorpositioninference;
 
 import android.media.MediaPlayer;
 import android.net.wifi.WifiManager;
@@ -6,7 +6,7 @@ import android.os.Bundle;
 
 import android.view.LayoutInflater;
 import android.view.View;
-import com.nodalpoint.indoorposition.ui.home.MyReceiver;
+import com.nodalpoint.indoorpositioninference.ui.home.MyReceiver;
 import androidx.core.app.ActivityCompat;
 import android.content.IntentFilter;
 import android.content.Context;

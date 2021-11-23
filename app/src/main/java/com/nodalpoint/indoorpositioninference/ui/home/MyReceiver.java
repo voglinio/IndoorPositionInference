@@ -1,17 +1,13 @@
-package com.nodalpoint.indoorposition.ui.home;
+package com.nodalpoint.indoorpositioninference.ui.home;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Build;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
 import androidx.annotation.RequiresApi;
-import com.nodalpoint.indoorposition.MainActivity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MyReceiver extends BroadcastReceiver {

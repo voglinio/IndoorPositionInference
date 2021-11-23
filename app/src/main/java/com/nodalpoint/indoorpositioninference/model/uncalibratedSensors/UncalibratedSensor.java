@@ -1,4 +1,4 @@
-package com.nodalpoint.indoorposition.model.uncalibratedSensors;
+package com.nodalpoint.indoorpositioninference.model.uncalibratedSensors;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;

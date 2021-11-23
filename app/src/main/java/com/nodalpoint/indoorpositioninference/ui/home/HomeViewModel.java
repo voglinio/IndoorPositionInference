@@ -1,4 +1,4 @@
-package com.nodalpoint.indoorposition.ui.home;
+package com.nodalpoint.indoorpositioninference.ui.home;
 
 import androidx.lifecycle.ViewModel;
 
