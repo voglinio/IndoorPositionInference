@@ -1,1 +1,3 @@
-IndoorPosition
+IndoorPosition Inference
+
+The purpose of this repo is to ...
