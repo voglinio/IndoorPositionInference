@@ -42,6 +42,8 @@ public class HomeFragment extends Fragment {
     private Spinner startingCheckpointSpinner;
     private Checkpoint currentCheckpoint;
     private TextView currentCheckpointTextView;
+    private TextView locationTextView;
+
     private List<Checkpoint> checkpoints;
     private SensorManager sensorManager;
     private String filename;
@@ -118,20 +120,23 @@ public class HomeFragment extends Fragment {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             checkpoints = setupCheckpoints();
         }
-        startingCheckpointSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                currentCheckpoint = checkpoints.get(position);
-                currentCheckpointTextView.setText("Last Checkpoint " + currentCheckpoint.getName());
-                setupNeighbours(currentCheckpoint);
-            }
+        locationTextView = (TextView) root.findViewById(R.id.location);
+         locationTextView.setText("MAlaka");
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
+//        startingCheckpointSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @RequiresApi(api = Build.VERSION_CODES.N)
+//            @Override
+//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//                currentCheckpoint = checkpoints.get(position);
+//                currentCheckpointTextView.setText("Last Checkpoint " + currentCheckpoint.getName());
+//                setupNeighbours(currentCheckpoint);
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parent) {
+//
+//            }
+//        });
         // Setup Managers
         sensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         setupSensors();
