@@ -20,11 +20,15 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.nodalpoint.indoorpositioninference.MainActivity;
 import com.nodalpoint.indoorpositioninference.R;
+import com.nodalpoint.indoorpositioninference.WifiEncoding;
+import com.nodalpoint.indoorpositioninference.WifiRec;
 import com.nodalpoint.indoorpositioninference.model.*;
 import com.nodalpoint.indoorpositioninference.model.uncalibratedSensors.UncalibratedAccelerometer;
 import com.nodalpoint.indoorpositioninference.model.uncalibratedSensors.UncalibratedGyroscope;
 import com.nodalpoint.indoorpositioninference.model.uncalibratedSensors.UncalibratedMagneticField;
 import com.nodalpoint.indoorpositioninference.model.uncalibratedSensors.UncalibratedSensor;
+
+import org.tensorflow.lite.Interpreter;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -70,6 +74,21 @@ public class HomeFragment extends Fragment {
         }
     };
 
+
+    private float  [] [] doInference(Interpreter tflite, float[] p) {
+
+        float[][] inputVal = new float[1][p.length];
+        for (int i = 0; i < p.length; i++) {
+            inputVal[0][i] = p[i];
+        }
+
+        float[][] output=new float[1][2];
+        tflite.run(inputVal,output);
+
+        tflite.resetVariableTensors();
+
+        return output;
+    }
     private Handler wifiBLeHandler = new Handler();
     final int wifiBLeHandlerDelay = 2000;
     private final Runnable wifiBLeRunnable = new Runnable() {
@@ -101,7 +120,16 @@ public class HomeFragment extends Fragment {
             ArrayAdapter<String> wifiArray = new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, ((MainActivity)getActivity()).getWifiResults());
             wifiList.setAdapter(wifiArray);
             if (DEBUG) System.out.println("------------------- wifi end   -------------------");
-
+            if (DEBUG) System.out.println("------------------- Model inference start   -------------------");
+            System.out.println("-----> getting " + ((MainActivity)getActivity()).wifRecsList.size() + " wifis");
+            WifiEncoding wiEnc = new WifiEncoding( ((MainActivity)getActivity()).wifRecsList);
+            //System.out.println(key + " " +  value.size() +  " " + value.get(0));
+            float [] x = wiEnc.encode(((MainActivity) getActivity()).bssids,
+                                       ((MainActivity) getActivity()).wifiDict);
+            float [][]prediction = doInference(((MainActivity) getActivity()).tflite,  x);
+            System.out.println("prediction (online) :" +  prediction[0][0]  + " " + prediction[0][1]);
+            if (DEBUG) System.out.println("------------------- Model inference end   -------------------");
+            locationTextView.setText("prediction (online) : \n" +  prediction[0][0]  + " " + prediction[0][1]);
             wifiBLeHandler.postDelayed(this, wifiBLeHandlerDelay);
         }
     };
@@ -117,9 +145,9 @@ public class HomeFragment extends Fragment {
         // Setup spinner
         startingCheckpointSpinner = (Spinner) root.findViewById(R.id.starting_checkpoint_spinner);
         linearLayout = (LinearLayout) root.findViewById(R.id.neighbours);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            checkpoints = setupCheckpoints();
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//            checkpoints = setupCheckpoints();
+//        }
         locationTextView = (TextView) root.findViewById(R.id.location);
          locationTextView.setText("MAlaka");
 
@@ -199,10 +227,10 @@ public class HomeFragment extends Fragment {
                     System.err.println("Cannot open file " + filename + "to write");
                 }
 
-                currentCheckpointTextView.setText("Checkpoint " + currentCheckpoint.getName());
+                //currentCheckpointTextView.setText("Checkpoint " + currentCheckpoint.getName());
                 startSessionBtn.setEnabled(false);
                 stopSessionBtn.setEnabled(true);
-                startingCheckpointSpinner.setEnabled(false);
+                //startingCheckpointSpinner.setEnabled(false);
                 sensorHandler.postDelayed(sensorsRunnable, sensorHandlerDelay);
                 wifiBLeHandler.postDelayed(wifiBLeRunnable, wifiBLeHandlerDelay);
             }
@@ -229,7 +257,7 @@ public class HomeFragment extends Fragment {
                 resetCheckpoint(currentCheckpointTextView);
                 startSessionBtn.setEnabled(true);
                 stopSessionBtn.setEnabled(false);
-                startingCheckpointSpinner.setEnabled(true);
+                //startingCheckpointSpinner.setEnabled(true);
                 sensorHandler.removeCallbacks(sensorsRunnable);
                 wifiBLeHandler.removeCallbacks(wifiBLeRunnable);
             }
@@ -320,65 +348,65 @@ public class HomeFragment extends Fragment {
         if (DEBUG) System.out.println(" ---------------------------------- ");
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    private List<Checkpoint> setupCheckpoints() {
-        availableCheckpoints = Checkpoint.generatePoints();
-        checkpoints = new ArrayList<>(availableCheckpoints.values());
-        ArrayAdapter<String> startingCheckpointAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, checkpoints.stream().map(Checkpoint::getName).collect(Collectors.toList()));
-        startingCheckpointAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        startingCheckpointSpinner.setAdapter(startingCheckpointAdapter);
-        return checkpoints;
-    }
+//    @RequiresApi(api = Build.VERSION_CODES.N)
+//    private List<Checkpoint> setupCheckpoints() {
+//        availableCheckpoints = Checkpoint.generatePoints();
+//        checkpoints = new ArrayList<>(availableCheckpoints.values());
+//        ArrayAdapter<String> startingCheckpointAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, checkpoints.stream().map(Checkpoint::getName).collect(Collectors.toList()));
+//        startingCheckpointAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        startingCheckpointSpinner.setAdapter(startingCheckpointAdapter);
+//        return checkpoints;
+//    }
 
     private void resetCheckpoint(TextView currentCheckpointTextView) {
         currentCheckpointTextView.setText("-");
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    private void setupNeighbours(Checkpoint checkpoint){
-        List<Checkpoint> neighbours = checkpoint.getNeighbours();
-        linearLayout.removeAllViews();
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        int rowsCount = neighbours.size() % 3 > 0 ?  (neighbours.size() / 3) + 1 : (neighbours.size() / 3);
-        for (int i=0; i<rowsCount; i++){
-            LinearLayout rowLayout = new LinearLayout(getContext());
-            rowLayout.setOrientation(LinearLayout.HORIZONTAL);
-            int rowSize = ((rowsCount == i+1) & (neighbours.size() % 3 != 0)) ? neighbours.size() % 3 : 3;
-            for (int j=0; j < rowSize; j++) {
-                LinearLayout btnLayout = new LinearLayout(getContext());
-                btnLayout.setOrientation(LinearLayout.VERTICAL);
-                btnLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT, 0.33333f));
-                Checkpoint chk = neighbours.get(j + 3*i);
-                Button btn = new Button(getContext());
-                btn.setText(chk.getName());
-                btn.setWidth(250);
-                btn.setHeight(250);
-                btn.setTextSize(25);
-                btn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if(!recordSession) { return; }
-                        //((MainActivity)getActivity()).mediaPlayer.start();
-
-                        currentCheckpoint = availableCheckpoints.get(chk.getId());
-                        currentCheckpointTextView.setText("Last Checkpoint " + currentCheckpoint.getName());
-                        System.out.println("CHECKPOINT " + currentCheckpoint.getName());
-                        long time= System.currentTimeMillis();
-                    try{
-                        writer.write(time + "\t" + "TYPE_CHECKPOINT" + "\t" + currentCheckpoint.getName() + "\n");
-                        writer.flush();
-                    }catch (IOException e) {
-                        System.err.println("Cannot open file " + filename + "to write");
-                    }
-                        setupNeighbours(currentCheckpoint);
-                    }
-                });
-                btnLayout.addView(btn);
-                lp.setMargins(20,10,20,10);
-                rowLayout.addView(btnLayout);
-            }
-            linearLayout.addView(rowLayout, lp);
-        }
-
-    }
+//    @RequiresApi(api = Build.VERSION_CODES.N)
+//    private void setupNeighbours(Checkpoint checkpoint){
+//        List<Checkpoint> neighbours = checkpoint.getNeighbours();
+//        linearLayout.removeAllViews();
+//        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+//        int rowsCount = neighbours.size() % 3 > 0 ?  (neighbours.size() / 3) + 1 : (neighbours.size() / 3);
+//        for (int i=0; i<rowsCount; i++){
+//            LinearLayout rowLayout = new LinearLayout(getContext());
+//            rowLayout.setOrientation(LinearLayout.HORIZONTAL);
+//            int rowSize = ((rowsCount == i+1) & (neighbours.size() % 3 != 0)) ? neighbours.size() % 3 : 3;
+//            for (int j=0; j < rowSize; j++) {
+//                LinearLayout btnLayout = new LinearLayout(getContext());
+//                btnLayout.setOrientation(LinearLayout.VERTICAL);
+//                btnLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT, 0.33333f));
+//                Checkpoint chk = neighbours.get(j + 3*i);
+//                Button btn = new Button(getContext());
+//                btn.setText(chk.getName());
+//                btn.setWidth(250);
+//                btn.setHeight(250);
+//                btn.setTextSize(25);
+//                btn.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        if(!recordSession) { return; }
+//                        //((MainActivity)getActivity()).mediaPlayer.start();
+//
+//                        currentCheckpoint = availableCheckpoints.get(chk.getId());
+//                        currentCheckpointTextView.setText("Last Checkpoint " + currentCheckpoint.getName());
+//                        System.out.println("CHECKPOINT " + currentCheckpoint.getName());
+//                        long time= System.currentTimeMillis();
+//                    try{
+//                        writer.write(time + "\t" + "TYPE_CHECKPOINT" + "\t" + currentCheckpoint.getName() + "\n");
+//                        writer.flush();
+//                    }catch (IOException e) {
+//                        System.err.println("Cannot open file " + filename + "to write");
+//                    }
+//                        setupNeighbours(currentCheckpoint);
+//                    }
+//                });
+//                btnLayout.addView(btn);
+//                lp.setMargins(20,10,20,10);
+//                rowLayout.addView(btnLayout);
+//            }
+//            linearLayout.addView(rowLayout, lp);
+//        }
+//
+//    }
 }

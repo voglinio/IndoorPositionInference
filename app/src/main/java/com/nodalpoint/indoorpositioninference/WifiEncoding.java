@@ -3,6 +3,7 @@ package com.nodalpoint.indoorpositioninference;
 import android.util.Pair;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -86,7 +87,7 @@ public class WifiEncoding {
         for (WifiRec w : wifi){
             wifis.add(w);
         }
-        //System.out.println("Read " + wifis.size() + " wifi elements ");
+        System.out.println("Read " + wifis.size() + " wifi elements ");
     }
     public WifiEncoding(List<WifiRec> wifi, int n1, int n2) {
         wifis = new ArrayList<WifiRec>();
@@ -149,7 +150,7 @@ public class WifiEncoding {
         }
         //System.out.println("===================================");
 
-        //System.out.println(Arrays.toString(res));
+        System.out.println(Arrays.toString(res));
 
 
         return res;
